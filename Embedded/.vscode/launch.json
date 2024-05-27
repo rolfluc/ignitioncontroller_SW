@@ -12,13 +12,12 @@
             "type": "cortex-debug",
             "runToEntryPoint": "main",
             "servertype": "jlink",
-            "serverpath": "C:/Program Files/SEGGER/JLink/JLinkGDBServerCL.exe",
+            "serverpath": "C:/Program Files/SEGGER/JLink_V796i/JLinkGDBServerCL.exe",
             "serverArgs": [],
             "device": "NAC1080",
             "interface": "swd",
             "serialNumber": "", //If you have more than one J-Link probe, add the serial number here.
-            "jlinkscript":"${workspaceFolder}/BSP/SEGGER/K66FN2M0_emPower/Setup/Kinetis_K66_Target.js",
-            "armToolchainPath": "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.2 Rel1\bin"
+            "armToolchainPath": "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.2 Rel1/bin"
         }
     ]
 }
