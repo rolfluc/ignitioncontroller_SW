@@ -80,13 +80,7 @@
 // prototypes
 void _nvm_start(void);
 
-#if STEPWISE_METHOD == STEPWISE_TIMER_CONTROLLED
-static void drive_motor_timer_controlled(void);
-#endif
-
-#if STEPWISE_METHOD == STEPWISE_VOLTAGE_CONTROLLED
 static void drive_motor_voltage_controlled(void);
-#endif
 
 
 /** @brief main function
@@ -100,105 +94,16 @@ void _nvm_start(void)
 
     set_hb_eventctrl(false);
 
-
-#if STEPWISE_METHOD == STEPWISE_TIMER_CONTROLLED
-    drive_motor_timer_controlled();
-#elif STEPWISE_METHOD == STEPWISE_VOLTAGE_CONTROLLED
     drive_motor_voltage_controlled();
-#else
-#error Please select STEPWISE_METHOD
-#endif
 
 
-    // background task is just an endless
+    // background task is just an endless loop - should never run.
     while (true)
     {
         asm("WFI");
     }
 
 }
-
-
-#if STEPWISE_METHOD == STEPWISE_TIMER_CONTROLLED
-
-/** @brief Simple timer based stepwise motor operation
- *
- *  This function charges an external capacitor on the VCCHB pin for a fixed amount of time to store energy.
- *  Then, the H bridge is switched on for a fixed amount of time to operate a motor from the stored energy.
- *  This scheme is repeated until the motor has reached its desired movement, e.g. until the configured number
- *  of steps was done.
- *
- *  The charging time of the capacitor as well as the running time of the motor are defined before compiling
- *  the firmware. They are estimated from tests, calculations or simulations and assume are based on an
- *  assumption regarding the power delivery through the NFC field. If the NFC field and the harvested power
- *  is lower, then this scheme may show less motor movement than necessary for a given device.
- *
- *  With a simple external charge detector circuitry, this scheme can be enhanced to dynamically adjust to
- *  different NFC harvesting levels. Just replace the timer based recharge delay with a loop that waits for
- *  the detection circuit to report a fully charged capacitor. After that, the well know amount of stored
- *  energy will operate the motor for a certain amount of time which can be predetermined from tests.
- *  Also, if you do not want to preset the number of steps, you may add a detection circuitry for the motor
- *  movement (switch, optical sensor).
- */
-static void drive_motor_timer_controlled(void)
-{
-    uint32_t count;
-    uint32_t i;
-
-    /* In every step, the motor performs a well known movement. After a given number of steps, the desired
-     * total movement was performed. Set the loop count here to the configured value.
-     */
-    count = LOOP_COUNT_COMPUTED;
-
-    /* When an NFC reader (e.g. smartphone) connects to the device, we assume that the external capacitor
-     * on the VCCHB pin is empty and needs a longer time to fully charge than in the following cycles. So
-     * we wait for the time configured for the initial charge.
-     */
-    sys_tim_singleshot_32(TIMER_SINGLE, wait_about_1ms * (DELAY_INITIAL_CHARGE), SYSTIM_IRQ);
-
-    /* Now we perform a loop to perform a movement step by step:
-     * - operate the motor with energy from the capacitor
-     * - stop the motor and recharge the capacitor
-     */
-    i = 0;
-
-    while (i < count)
-    {
-        /* Here we start the motor. This is done in two steps: first connect one side of the motor to the
-         * positive voltage, then the other side to the negative voltage.
-         */
-        set_hb_switch(true, false, false, false);
-        set_hb_switch(true, false, false, true);
-
-        /* Now the motor is running. Before switching it off, we wait for a fixed amount of time, and let
-         * the motor perform one step of the movement.
-         */
-        sys_tim_singleshot_32(TIMER_SINGLE, wait_about_1ms * (DELAY_MOTOR_RUN), SYSTIM_IRQ);
-
-        /* Now one step of the movement is done, and the H bridge outputs are switched off to stop the motor.
-         */
-        set_hb_switch(false, false, false, false);
-
-        /* The operation of the motor has drained the capacitor. Now the motor is switched off, and the
-         * harvested energy flows into the capacitor and recharges it. Just wait until the capacitor is
-         * fully charged again.
-         * Note: After the last motor movement, this delay can be skipped.
-         */
-        sys_tim_singleshot_32(TIMER_SINGLE, wait_about_1ms * (DELAY_MOTOR_OFF), SYSTIM_IRQ);
-
-        /* Now the capacitor is fully charged again, and we can continue with the next step - or finish
-         * if all steps are done.
-         */
-        i++;
-    }
-
-    /* All done now. Just make sure the H bridge is switched off.
-     */
-    set_hb_switch(false, false, false, false);
-}
-
-#endif
-
 
 #if STEPWISE_METHOD == STEPWISE_VOLTAGE_CONTROLLED
 
