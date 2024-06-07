@@ -13,7 +13,7 @@
       "client": "arm-none-eabi-gdb",
       "server": "JLinkGDBServer",
       "windows": {
-        "server": "C:/Program Files (x86)/SEGGER/JLink/JLinkGDBServerCL.exe",
+        "server": "C:/Program Files/SEGGER/JLink/JLinkGDBServerCL.exe",
         "serverHost": "localhost"
       },
       "serverArgs": [
@@ -57,7 +57,7 @@
       "client": "arm-none-eabi-gdb",
       "server": "JLinkGDBServer",
       "windows": {
-        "server": "C:/Program Files (x86)/SEGGER/JLink/JLinkGDBServerCL.exe",
+        "server": "C:/Program Files/SEGGER/JLink/JLinkGDBServerCL.exe",
         "serverHost": "localhost"
       },
       "serverArgs": [
@@ -101,7 +101,7 @@
       "client": "arm-none-eabi-gdb",
       "server": "JLinkGDBServer",
       "windows": {
-        "server": "C:/Program Files (x86)/SEGGER/JLink/JLinkGDBServerCL.exe",
+        "server": "C:/Program Files/SEGGER/JLink/JLinkGDBServerCL.exe",
         "serverHost": "localhost"
       },
       "serverArgs": [
